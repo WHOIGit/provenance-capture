@@ -1,6 +1,8 @@
 import json
 import datetime
 
+import traceback
+
 from uuid import uuid4
 
 class Step(object):
@@ -22,7 +24,7 @@ class Step(object):
         self.start()
         return self
     
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, exc_type, exc_value, exception_traceback):
         if exc_type is not None:
             self.fail(exception=exc_value)
         else:
@@ -55,13 +57,13 @@ class Step(object):
         self.end_time = datetime.datetime.utcnow().isoformat()
         self.succeeded = True
     
-    def fail(self, message=None, exception=None, traceback=None):
+    def fail(self, message=None, exception=None):
         self.end_time = datetime.datetime.now().isoformat()
         self.succeeded = False
         if message is None and exception is not None:
             self.error_message = str(exception)
             if traceback is not None:
-                self.error_traceback = traceback.format_exc()
+                self.error_traceback = traceback.format_exception(exception)
         self.outputs = []
 
     def log(self):
