@@ -5,8 +5,34 @@ import traceback
 
 from uuid import uuid4
 
+
+class Logger(object):
+    def __init__(self, callback):
+        self.callback = callback
+
+    def log(self, entry):
+        self.callback(entry)
+
+    @staticmethod
+    def stdout():
+        return Logger(print)
+
+    @staticmethod
+    def file(path):
+        def log_to_file(entry):
+            with open(path, "a") as file:
+                file.write(json.dumps(entry) + "\n")
+        return Logger(log_to_file)
+    
+    @staticmethod
+    def cache(appendable):
+        def log_to_cache(entry):
+            appendable.append(entry)
+        return Logger(log_to_cache)
+
+
 class Step(object):
-    def __init__(self, name=None, id=None, version=None, description=None, parent=None):
+    def __init__(self, name=None, id=None, version=None, description=None, parent=None, logger=None):
         self.step_id = id if id is not None else str(uuid4())
         self.step_name = name
         self.description = description
@@ -19,13 +45,17 @@ class Step(object):
         self.succeeded = False
         self.error_message = None
         self.error_traceback = None
+        self.logger = logger
         if parent is not None:
             try:
                 self.parent_id = parent.step_id
-            except AttributeError:
+                self.parent = parent
+            except AttributeError: # assume parent is a parent ID because the Step object is not available locally
                 self.parent_id = parent
+                self.parent = None
         else:
             self.parent_id = None
+            self.parent = None
     
     def __enter__(self):
         self.start()
@@ -73,21 +103,28 @@ class Step(object):
                 self.error_traceback = traceback.format_exception(exception)
         self.outputs = []
 
-    def log(self):
-        log_entry = {
-            "stepId": self.step_id,
-            "name": self.step_name,
-            "version": self.version,
-            "description": self.description,
-            "parent": self.parent_id,
-            "startTime": self.start_time,
-            "endTime": self.end_time,
-            "succeeded": self.succeeded,
-            "errorMessage": self.error_message,
-            "errorTraceback": self.error_traceback,
-            "inputs": self.inputs,
-            "outputs": self.outputs,
-            "parameters": self.parameters
-        }
-        # dump json to a single line
-        print(json.dumps(log_entry))
+    def log(self, entry=None):
+        if entry is None:
+            entry = {
+               "stepId": self.step_id,
+                "name": self.step_name,
+                "version": self.version,
+                "description": self.description,
+                "parent": self.parent_id,
+                "startTime": self.start_time,
+                "endTime": self.end_time,
+                "succeeded": self.succeeded,
+                "errorMessage": self.error_message,
+                "errorTraceback": self.error_traceback,
+                "inputs": self.inputs,
+                "outputs": self.outputs,
+                "parameters": self.parameters
+            }
+
+        if self.logger is None:
+            if self.parent is not None:
+                self.parent.log(entry)
+            else:
+                print(json.dumps(entry))
+        else:
+            self.logger.log(entry)
