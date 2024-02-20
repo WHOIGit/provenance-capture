@@ -6,7 +6,7 @@ import traceback
 from uuid import uuid4
 
 class Step(object):
-    def __init__(self, name=None, id=None, version=None, description=None):
+    def __init__(self, name=None, id=None, version=None, description=None, reraise=True):
         self.step_id = id if id is not None else str(uuid4())
         self.step_name = name
         self.description = description
@@ -19,6 +19,7 @@ class Step(object):
         self.succeeded = False
         self.error_message = None
         self.error_traceback = None
+        self.reraise = reraise
     
     def __enter__(self):
         self.start()
@@ -27,9 +28,11 @@ class Step(object):
     def __exit__(self, exc_type, exc_value, exception_traceback):
         if exc_type is not None:
             self.fail(exception=exc_value)
+            self.log()
+            return not self.reraise
         else:
             self.end()
-        self.log()
+            self.log()
 
     def add_input(self, name=None, id=None, description=None):
         input = {
