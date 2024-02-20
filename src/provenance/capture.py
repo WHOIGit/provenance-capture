@@ -25,6 +25,8 @@ class Step(object):
                 self.parent_id = parent.step_id
             except AttributeError:
                 self.parent_id = parent
+        else:
+            self.parent_id = None
     
     def __enter__(self):
         self.start()
