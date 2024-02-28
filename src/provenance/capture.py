@@ -5,6 +5,7 @@ import traceback
 
 from uuid import uuid4
 
+from .amqp import amqp_publish
 
 class Logger(object):
     def __init__(self, callback):
@@ -30,6 +31,12 @@ class Logger(object):
             appendable.append(entry)
         return Logger(log_to_cache)
 
+    @staticmethod
+    def amqp(host, queue_name):
+        def log_to_amqp(entry):
+            amqp_publish(host, queue_name, json.dumps(entry))
+        return Logger(log_to_amqp)
+    
 
 class Step(object):
     def __init__(self, name=None, id=None, version=None, description=None, parent=None, logger=None):
