@@ -2,8 +2,10 @@ import random
 
 from provenance.capture import Step, Logger
 
+
 # log to a JSONL file
 logger = Logger.file('example.log')
+
 
 # containing step is the whole job
 with Step(name='processing job', logger=logger) as job:
