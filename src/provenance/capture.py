@@ -37,6 +37,20 @@ class Logger(object):
             amqp_publish(host, exchange_name, entry)
         return Logger(log_to_amqp)
     
+    @staticmethod
+    def fanout(loggers):
+        def log_to_fanout(entry):
+            for logger in loggers:
+                logger.log(entry)
+        return Logger(log_to_fanout)
+    
+    @staticmethod
+    def filter(logger, filter=lambda entry: True):
+        def log_to_filtered(entry):
+            if filter(entry):
+                logger.log(entry)
+        return Logger(log_to_filtered)
+
 
 class Step(object):
     def __init__(self, name=None, id=None, version=None, description=None, parent=None, logger=None):
