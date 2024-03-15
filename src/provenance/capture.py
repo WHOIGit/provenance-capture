@@ -32,9 +32,9 @@ class Logger(object):
         return Logger(log_to_cache)
 
     @staticmethod
-    def amqp(host, exchange_name):
+    def amqp(host, user, password, exchange_name):
         def log_to_amqp(entry):
-            amqp_publish(host, exchange_name, entry)
+            amqp_publish(host, user, password, exchange_name, entry)
         return Logger(log_to_amqp)
     
     @staticmethod
