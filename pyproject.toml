@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "provenance-capture"
-version = "0.1.0"
+version = "0.1.1"
 description = "A short description of your project."
 readme = "README.md"
 authors = [{name = "Joe Futrelle", email = "jfutrelle@whoi.edu"}]
