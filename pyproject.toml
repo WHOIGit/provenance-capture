@@ -15,7 +15,7 @@ classifiers = [
 ]
 keywords = ['provenance']
 dependencies = [
-    'git+https://github.com/WHOIGit/amplify-amqp-utils.git'
+    'amqp@git+https://github.com/WHOIGit/amplify-amqp-utils.git'
 ]
 
 [tool.hatch.build.targets.wheel]
