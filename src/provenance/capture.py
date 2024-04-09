@@ -5,7 +5,8 @@ import traceback
 
 from uuid import uuid4
 
-from .amqp import amqp_publish
+from amqp.rabbit import publish, subscribe
+
 
 class Logger(object):
     def __init__(self, callback):
@@ -32,9 +33,9 @@ class Logger(object):
         return Logger(log_to_cache)
 
     @staticmethod
-    def amqp(host, user, password, exchange_name):
+    def amqp(host, user, password, exchange_name, exchange_type='fanout', routing_key=''):
         def log_to_amqp(entry):
-            amqp_publish(host, user, password, exchange_name, entry)
+            publish(entry, host, user, password, exchange_name, exchange_type='fanout', routing_key='')
         return Logger(log_to_amqp)
     
     @staticmethod
@@ -149,3 +150,22 @@ class Step(object):
                 print(json.dumps(entry))
         else:
             self.logger.log(entry)
+
+
+class Subscriber(object):
+    """receive messages from an amqp queue and log them to a provenance capture Logger. Assumes msgs are json"""
+    def __init__(self, logger, host, user, password, exchange_name, exchange_type='fanout', routing_key='', queue_name=''):
+        self.host = host
+        self.user = user
+        self.password = password
+        self.exchange_name = exchange_name
+        self.exchange_type = exchange_type
+        self.routing_key = routing_key
+        self.queue_name = queue_name
+        self.logger = logger
+
+    def start(self):
+        def callback(entry):
+            self.logger.log(entry)
+        subscribe(callback, self.host, self.user, self.password, self.exchange_name, self.exchange_type, self.routing_key, self.queue_name)
+

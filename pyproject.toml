@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "provenance-capture"
-version = "0.1.1"
-description = "A short description of your project."
+version = "0.1.2"
+description = "Simple provenance logging in JSONL"
 readme = "README.md"
 authors = [{name = "Joe Futrelle", email = "jfutrelle@whoi.edu"}]
 classifiers = [
@@ -15,7 +15,7 @@ classifiers = [
 ]
 keywords = ['provenance']
 dependencies = [
-    'pika'
+    'git+https://github.com/WHOIGit/amplify-amqp-utils.git'
 ]
 
 [tool.hatch.build.targets.wheel]
