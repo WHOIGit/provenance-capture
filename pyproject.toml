@@ -24,6 +24,3 @@ packages = ["src/provenance"]
 [project.urls]
 Repository = "https://github.com/WHOIGit/provenance-capture"
 
-[tool.hatch.metadata]
-allow-direct-references = true
-
