@@ -35,7 +35,7 @@ class Logger(object):
     @staticmethod
     def amqp(host, user, password, exchange_name, exchange_type='fanout', routing_key=''):
         def log_to_amqp(entry):
-            publish(entry, host, user, password, exchange_name, exchange_type='fanout', routing_key='')
+            publish(entry, host, user, password, exchange_name, exchange_type, routing_key)
         return Logger(log_to_amqp)
     
     @staticmethod
